@@ -1,12 +1,12 @@
 # coding:utf-8
-# das.py 2012.11.23
+# mbedDisassembler.py 2012.11.25
 #
 import copy
 import logging
 import dasv7m
 from daslib import *
 
-class das(object):
+class mbedDisassembler(object):
     def __init__(self):
         self.das = dasv7m.dasv7m()
         self.decode = self.das.decode
@@ -35,10 +35,12 @@ class das(object):
 if __name__=="__main__":
     logging.basicConfig(level=logging.INFO)
     import argparse
-    das = das()
+    import mbedVector
+    das = mbedDisassembler()
     parser = argparse.ArgumentParser()
-    parser.add_argument('infiles', nargs='*')
+    parser.add_argument('infiles', nargs='+', help=u"入力ファイル(*.bin)")
     parser.add_argument('-a', '--address', nargs=1, help=u"開始アドレス")
+    parser.add_argument('--offset', nargs=1, help=u"オフセットアドレス")
 
     args = parser.parse_args()
     for i, filename in enumerate(args.infiles):
@@ -49,7 +51,8 @@ if __name__=="__main__":
         if args.address:
             pc = int(args.address[0], 16)
         else:
-            pc = data[4] | data[5]<<8 | data[6]<<16 | data[7]<<24
+            vec = mbedVector.mbedVector(data)
+            pc = vec.pc
             pc &= 0xfffffffe
             print "address: %08X" % pc
         das.mmap.load(data)

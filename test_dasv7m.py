@@ -1,5 +1,5 @@
 # coding:utf-8
-# test_dasv7m.py 2012.11.23
+# test_dasv7m.py 2012.11.25
 #
 import unittest
 import dasv7m
@@ -169,7 +169,7 @@ class Test_dasv7m_16bit(unittest.TestCase):
         r = self.decode(code)
         self.assertEqual(r, ["B","00000000"])
 
-    def test_a000(self): # ADR
+    def test_A000_ADR(self): # ADR
         code = 0xa000
         r = self.decode(code)
         self.assertEqual(r, ["ADR","R0,00000000"])
@@ -207,6 +207,76 @@ class Test_dasv7m_32bit_B(unittest.TestCase):
         pc = 0
         r = self.decode(code, pc)
         self.assertEqual(r, ["LDRD","R8,R9,FFFFFFFC"])
+
+    def test_F20F0000_ADR_W_R0_00000000(self):
+        code = 0xf20f0000
+        for pc in range(4):
+            r = self.decode(code, pc)
+            self.assertEqual(r, ["ADR.W","R0,00000000"])
+
+    def test_F20F0000_ADR_W_R0_00000004_PC_4(self):
+        code = 0xf20f0000
+        for pc in range(4,8,1):
+            r = self.decode(code, pc)
+            self.assertEqual(r, ["ADR.W","R0,00000004"])
+
+    def test_F2AF0000_SUB_R0_PC_0(self):
+        code = 0xf2af0000
+        pc = 0
+        r = self.decode(code, pc)
+        self.assertEqual(r, ["SUB","R0,PC,#0"])
+
+    def test_F2AF0A00_SUB_R10_PC_0(self):
+        code = 0xf2af0a00
+        pc = 0
+        r = self.decode(code, pc)
+        self.assertEqual(r, ["SUB","R10,PC,#0"])
+
+    def test_F36F0000_BFC_R0(self):
+        code = 0xf36f0000
+        r = self.decode(code)
+        self.assertEqual(r, ["BFC","R0,#0,#1"])
+
+    def test_F36F7CFF_BFC_R12(self):
+        code = 0xf36f7cff
+        r = self.decode(code)
+        self.assertEqual(r, ["BFC","R12,#31,#1"])
+
+    def test_F3610203_BFI_R2_R1(self):
+        code = 0xf3610204
+        r = self.decode(code)
+        self.assertEqual(r, ["BFI","R2,R1,#0,#5"])
+
+    def test_F0200000_BIC(self):
+        code = 0xf0200000
+        r = self.decode(code)
+        self.assertEqual(r, ["BIC","R0,R0,#0"])
+
+    def test_EA220103_BIC_R1_R2_R3(self):
+        code = 0xea220103
+        r = self.decode(code)
+        self.assertEqual(r, ["BIC","R1,R2,R3"])
+
+class Test_dasv7m_16bit_IT(unittest.TestCase):
+    def setUp(self):
+        self.das = dasv7m.dasv7m()
+        self.decode = self.das.decode
+        
+    def test_BF08_IT_EQ(self):
+        r = self.decode(0xbf08)
+        self.assertEqual(r, ["IT","EQ"])
+
+    def test_BF04_ITT_EQ(self):
+        r = self.decode(0xbf04)
+        self.assertEqual(r, ["ITT","EQ"])
+
+    def test_BF18_IT_EQ(self):
+        r = self.decode(0xbf18)
+        self.assertEqual(r, ["IT","NE"])
+
+    def test_BF0F_ITEEE_EQ(self):
+        r = self.decode(0xbf0f)
+        self.assertEqual(r, ["ITEEE","EQ"])
 
 if __name__=="__main__":
     unittest.main()

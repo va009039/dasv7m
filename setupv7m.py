@@ -1,5 +1,5 @@
 # coding:utf-8
-# setupv7m.py 2012.11.24
+# setupv7m.py 2012.11.25
 #
 # ARMv7-Mの命令セット
 #
@@ -19,6 +19,35 @@ thumb16sub = [
 ("<iflags>", "f","xxxxxxxx_xxxxxx01"), # CPS
 ("<iflags>","i", "xxxxxxxx_xxxxxx10"), # CPS
 ("<iflags>","if","xxxxxxxx_xxxxxx11"), # CPS
+("<xyz>","",        "xxxxxxxx_xxxx_1000"),    # IT
+("<xyz>","T",       "xxxxxxxx_xxx0_0100"),    # IT
+("<xyz>","E",       "xxxxxxxx_xxx0_1100"),    # IT
+("<xyz>","TT",      "xxxxxxxx_xxx0_0010"),    # IT
+("<xyz>","TE",      "xxxxxxxx_xxx0_0110"),    # IT
+("<xyz>","ET",      "xxxxxxxx_xxx0_1010"),    # IT
+("<xyz>","EE",      "xxxxxxxx_xxx0_1110"),    # IT
+("<xyz>","TTT",     "xxxxxxxx_xxx0_0001"),    # IT
+("<xyz>","TTE",     "xxxxxxxx_xxx0_0011"),    # IT
+("<xyz>","TET",     "xxxxxxxx_xxx0_0101"),    # IT
+("<xyz>","TEE",     "xxxxxxxx_xxx0_0111"),    # IT
+("<xyz>","ETT",     "xxxxxxxx_xxx0_1001"),    # IT
+("<xyz>","ETE",     "xxxxxxxx_xxx0_1011"),    # IT
+("<xyz>","EET",     "xxxxxxxx_xxx0_1101"),    # IT
+("<xyz>","EEE",     "xxxxxxxx_xxx0_1111"),    # IT
+("<xyz>","E",       "xxxxxxxx_xxx1_0100"),    # IT
+("<xyz>","T",       "xxxxxxxx_xxx1_1100"),    # IT
+("<xyz>","EE",      "xxxxxxxx_xxx1_0010"),    # IT
+("<xyz>","ET",      "xxxxxxxx_xxx1_0110"),    # IT
+("<xyz>","TE",      "xxxxxxxx_xxx1_1010"),    # IT
+("<xyz>","TT",      "xxxxxxxx_xxx1_1110"),    # IT
+("<xyz>","EEE",     "xxxxxxxx_xxx1_0001"),    # IT
+("<xyz>","EET",     "xxxxxxxx_xxx1_0011"),    # IT
+("<xyz>","ETE",     "xxxxxxxx_xxx1_0101"),    # IT
+("<xyz>","ETT",     "xxxxxxxx_xxx1_0111"),    # IT
+("<xyz>","TEE",     "xxxxxxxx_xxx1_1001"),    # IT
+("<xyz>","TET",     "xxxxxxxx_xxx1_1011"),    # IT
+("<xyz>","TTE",     "xxxxxxxx_xxx1_1101"),    # IT
+("<xyz>","TTT",     "xxxxxxxx_xxx1_1111"),    # IT
 ]
 
 thumb16 = [
@@ -81,7 +110,7 @@ thumb16 = [
 ("CMP","<Rn4>,<Rm>","010000101_N:1_Rm:3_Rn:3"),
 ("MOV","<D_Rd>,<Rm>",       "01000110_D:1_Rm:4_Rd:3"),
 ("BKPT","#<imm8>","10111110_imm8:8"),
-("IT","<cond>","10111111_cond:4_mask:4"),
+("IT<xyz>","<cond>","10111111_cond:4_mask:4"),
 ("SVC","#<imm8>","11011111_imm8:8"),
 ("SUBS","<Rd>,#<imm8>","00111_Rd:3_imm8:8"),
 ("LSLS","<Rd>,<Rm>,#<imm5>","00000_imm5:5_Rm:3_Rd:3"),
@@ -148,8 +177,9 @@ thumb32 = [
 ("ADD<S>,<c>",  "<Rd>,SP,<Rm><shift>",  "11101011000_S:1_1101_0_xxx_Rd:4_xxxx_Rm:4"),
 ("ADD<S>",     "<Rd>,<Rn>,<Rm><shift>", "11101011000_S:1_Rn:4_x_xxx_Rd:4_xxxx_Rm:4"),
 
-("ADR<c>.W",      "<Rd>,<label32_ADR>",           "11110_i:1_10000011110_imm3:3_Rd:4_imm8:8"), # add=True
-("ADR<c>.W",      "<Rd>,<label32_ADR>",           "11110_i:1_10101011110_imm3:3_Rd:4_imm8:8"), # add=False
+("ADR<c>.W",      "<Rd>,<label32_ADR>",   "11110_i:1_10000011110_imm3:3_Rd:4_imm8:8"), # add=True
+("SUB<c>",      "<Rd>,PC,#0",             "11110_0_10101011110_000_Rd:4_00000000"), # add=False
+("ADR<c>.W",      "<Rd>,<label32_ADR>",   "11110_i:1_10101011110_imm3:3_Rd:4_imm8:8"), # add=False
 
 ("WFE<c>.W",      "",                                 "1111001110101111_10000000_00000010"),
 ("WFI<c>.W",      "",                                 "1111001110101111_10000000_00000011"),
@@ -199,7 +229,7 @@ thumb32 = [
 
 
 ("AND<S><c>.W","<Rd>,<Rn>,<Rm><shift>", "11101010000_S:1_Rn:4_x_xxx_Rd:4_xxxx_Rm:4"),
-("BIC<S>,<c>", "<Rd>,<Rn>,<Rm><shift>", "11101010001_S:1_Rn:4_x_xxx_Rd:4_xxxx_Rm:4"),
+("BIC<S><c>", "<Rd>,<Rn>,<Rm><shift>",  "11101010001_S:1_Rn:4_x_xxx_Rd:4_xxxx_Rm:4"),
 ("EOR<S><c>.W","<Rd>,<Rn>,<Rm><shift>", "11101010100_S:1_Rn:4_x_xxx_Rd:4_xxxx_Rm:4"),
 ("ADC<S>.W",   "<Rd>,<Rn>,<Rm><shift>", "11101011010_S:1_Rn:4_x_xxx_Rd:4_xxxx_Rm:4"),
 
@@ -211,10 +241,10 @@ thumb32 = [
 ("B<c>.W",        "<label32>",                        "11110_S:1_imm10:10_10_J1:1_1_J2:1_imm11:11"),
 ("BL<c>",         "<label32>",                        "11110_S:1_imm10:10_11_J1:1_1_J2:1_imm11:11"),
 
-("BFC<c>",        "<Rd>,#<lsb>,#<width>",       "11110011011011110_imm3:3_Rd:4_imm2:2_0_msb:5"),
-("BFI<c>",        "<Rd>,<Rn>,#<lsb>,#<width>",  "111100110110_Rn:4_0_imm3:3_Rd:4_imm2:2_0_msb:5"),
-("SBFX<c>",       "<Rd>,<Rn>,#<lsb>,#<width2>",  "11110x110100_Rn:4_0_imm3:3_Rd:4_imm2:2_x_widthm1:5"),
-("UBFX<c>",       "<Rd>,<Rn>,#<lsb>,#<width2>",  "11110x111100_Rn:4_0_imm3:3_Rd:4_imm2:2_x_widthm1:5"),
+("BFC<c>",        "<Rd>,#<lsb>,#<width>",       "11110x110110_1111_0_imm3:3_Rd:4_imm2:2_x_msb:5"),
+("BFI<c>",        "<Rd>,<Rn>,#<lsb>,#<width>",  "11110x110110_Rn:4_0_imm3:3_Rd:4_imm2:2_x_msb:5"),
+("SBFX<c>",       "<Rd>,<Rn>,#<lsb>,#<width2>", "11110x110100_Rn:4_0_imm3:3_Rd:4_imm2:2_x_widthm1:5"),
+("UBFX<c>",       "<Rd>,<Rn>,#<lsb>,#<width2>", "11110x111100_Rn:4_0_imm3:3_Rd:4_imm2:2_x_widthm1:5"),
 
 ("CDP<c>","<coproc>,<opc1>,<CRd>,<Rn>,<Rm>,<opc2>", "1110_1110_opc1:4_Rn:4_CRd:4_coproc:4_opc2:3_0_Rm:4"),
 ("CDP2<c>","<coproc>,<opc1>,<CRd>,<Rn>,<Rm>,<opc2>","1111_1110_opc1:4_Rn:4_CRd:4_coproc:4_opc2:3_0_Rm:4"),
@@ -469,9 +499,9 @@ class setup(object):
         for base_fmt1, base_fmt2, base_info in self.table:
             result2 = []
             for name in self.index:
-                if name in base_fmt2:
+                if name in base_fmt1 or name in base_fmt2:
                     for sub_fmt,sub_info in self.index[name]:
-                        fmt1 = base_fmt1
+                        fmt1 = base_fmt1.replace(name, sub_fmt)
                         fmt2 = base_fmt2.replace(name, sub_fmt)
                         info = CodeInfo(code_size=self.code_size)
                         info.field = base_info.field
@@ -479,7 +509,6 @@ class setup(object):
                         info.pat = base_info.pat | sub_info.pat
                         info.mask = base_info.mask | sub_info.mask
                         result2.append([fmt1, fmt2, info])
-                        rflag = True
             if len(result2) == 0:
                 result.append([base_fmt1, base_fmt2, base_info])
             result.extend(result2)
